@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CHAT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+    <style>
+  
+        body { 
+            margin: 0 auto;
+            padding: 0;
+            width: auto;
+            height: 100%;
+        }
+        input{
+            width: 250px;
+            background-color: chartreuse;
+            font-size: 16px;
+            border-radius: 5px 0px 0px 5px;
+            border: 2px solid black;
+        }
+        button{
+            width: 250px;
+            background-color: rgba(43, 85, 0, 0.5);
+            font-size: 16px;
+            border-radius: 0px 5px 5px 0px;
+            border: 2px solid black;
+            position: absolute;
+            color: aliceblue;
+            font-style: unset;
+        }
+        #chat{
+            width: 950px;
+            border: 10px solid black;
+            padding: 50px;
+            background-color: #00ffb3;
+            display: block;
+            flex-direction: column
+        }
+        .mensagem{
+            background-color: aquamarine;
+            padding: 5px;
+            margin: 1px;
+            color: black;
+            font-size: 17px;
+        } 
+    </style>
+
+</head>
+<body>
+    <form id="chat">
+
+        <input type="text" name="username" placeholder="Seu nome">
+        <div class="mensagem"></div>
+
+        <input type="text" name="message" placeholder="Sua mensagem">
+        <button type="submit">Enviar Mensagem</button>
+    </form>
+    <script> type="text/javascript"
+         var socket = io('http://25.56.160.152:3000');
+         
+         socket.on('msgRecente', (msg)=>{
+            renderMessage(msg);
+         })
+         socket.on('previousMsg', (msg)=>{
+            for(msg_one of msg){
+                renderMessage(msg_one);
+            }
+         });
+         function renderMessage(msg){
+             $('.mensagem').append('<div>'+ msg.author +' : '+msg.message+'</div>');
+         }
+
+         // Verifica se o button foi submitado
+         $('#chat').submit(function(event){
+             // Não envia o formulário
+            event.preventDefault();
+            
+            var autor = $('input[name=username]').val();
+            var msg = $('input[name=message]').val();
+
+            // Verifica se existe informação dentro das duas variaveis
+            if(autor.length && msg.length){
+              var msgObject = {
+                    author: autor,
+                    message: msg
+              }; 
+
+                renderMessage(msgObject);
+
+                // Request para o servidor mandando nosso OBJ com as informações do usuário
+                socket.emit('clientSide', msgObject);
+                $('input[name=message]').val("");
+            }else{
+                alert('Preencha todos os campos, para conversar');
+            }
+         });
+    </script>
+</body>
+</html>
