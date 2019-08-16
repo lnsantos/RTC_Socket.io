@@ -61,7 +61,7 @@
         <button type="submit">Enviar Mensagem</button>
     </form>
     <script> type="text/javascript"
-         var socket = io('http://25.56.160.152:3000');
+         var socket = io('http://127.0.0.1:3000');
          
          socket.on('msgRecente', (msg)=>{
             renderMessage(msg);
